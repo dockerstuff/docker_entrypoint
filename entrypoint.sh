@@ -5,7 +5,7 @@
 #==============================================#
 
 # Executable to which cl arguments should fit
-INTERP="${ENTRYPOINT-'echo'}"
+EXECAPP="${EXECAPP:-'/bin/bash'}"
 
 # Save the input cl arguments
 DARGS="$*"
@@ -33,9 +33,9 @@ function config_user()
         # nothing to be done here
         return 0
     
-    DUSER="${DUSER-$DEFAULT_USER}"
-    DUID="${DUID-$DEFAULT_UID}"
-    DGID="${DGID-$DEFAULT_GID}"
+    DUSER="${DUSER:-$DEFAULT_USER}"
+    DUID="${DUID:-$DEFAULT_UID}"
+    DGID="${DGID:-$DEFAULT_GID}"
     
     useradd -u "$DUID" \
             -g "$DGID" \
@@ -43,7 +43,7 @@ function config_user()
             -s /bin/bash \
             "$DUSER"
     
-    echo $DUSER
+    echo "$DUSER"
 }
 
 
@@ -51,7 +51,7 @@ function config_user()
 USERNAME=$(config_user)
 
 # If no user created, define the current one (root)
-[[ `id $USERNAME` ]] || USERNAME="$USER"
+[[ `id "$USERNAME"` ]] || USERNAME="$USER"
 
 # Garantee the user will run on a proper place.
 # WORKDIR is the dir where the user will run from.
@@ -71,7 +71,5 @@ else
     WORKDIR=$(getent passwd $USERNAME | awk -F: '{print $(NF-1)}')
 fi
 
-su -l $USERNAME -c "cd $WORKDIR && $INTERP $DARGS"
-
-#!/bin/bash -e
+su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
 
