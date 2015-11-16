@@ -3,6 +3,7 @@
 # Script to support the initialization process #
 #  in a docker container.                      #
 #==============================================#
+#set -xv
 
 # Executable to which cl arguments should fit
 EXECAPP="${EXECAPP:-'/bin/bash'}"
@@ -41,9 +42,10 @@ function config_user()
             -g "$DGID" \
             -d "/home/$DUSER" -m \
             -s /bin/bash \
-            "$DUSER"
+            "$DUSER" || return 1
     
     echo "$DUSER"
+    return 0
 }
 
 
@@ -57,15 +59,10 @@ USERNAME=$(config_user)
 # WORKDIR is the dir where the user will run from.
 if [ ! -z "$WORKDIR" ]; then
     # If WORKDIR is defined, verify the permissions
-    if [ -d "$WORKDIR" ]; then
-        if [ ! -w "$WORKDIR" ]; then
-            chown -R ${USERNAME}: $WORKDIR
-            chmod 755 $WORKDIR
-        fi
-    else
+    if [ ! -d "$WORKDIR" ]; then
         mkdir -p $WORKDIR
-        chown ${USERNAME}: $WORKDIR
     fi
+    chown -R ${USERNAME}: $WORKDIR
 else
     # If WORKDIR is not defined, use its HOME
     WORKDIR=$(getent passwd $USERNAME | awk -F: '{print $(NF-1)}')
