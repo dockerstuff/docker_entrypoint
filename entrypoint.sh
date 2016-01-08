@@ -57,16 +57,23 @@ USERNAME=$(config_user)
 
 # Garantee the user will run on a proper place.
 # WORKDIR is the dir where the user will run from.
-if [ ! -z "$WORKDIR" ]; then
-    # If WORKDIR is defined, verify the permissions
-    if [ ! -d "$WORKDIR" ]; then
-        mkdir -p $WORKDIR
-    fi
-    chown -R ${USERNAME}: $WORKDIR
-else
-    # If WORKDIR is not defined, use its HOME
-    WORKDIR=$(getent passwd $USERNAME | awk -F: '{print $(NF-1)}')
-fi
+[[ -z "$WORKDIR" ]] && export WORKDIR='/work'
 
+# Verify WORKDIR existence
+[[ ! -d "$WORKDIR" ]] && mkdir -p $WORKDIR
+
+# And grant permissions
+# To simplify the permissions now, I'll give ownership.
+#TODO: give 'w/r/x' permissions instead of changing ownership;
+#      this is important 'cause WORKDIR could already exist.
+chown ${USERNAME}: $WORKDIR && chmod u+w $WORKDIR
+
+echo "" 
+echo "#==========================================#"
+echo " This container is running: \'$EXECAPP\',"
+echo " with arguments: \'$DARGS\',"
+echo " at directory: \'$WORKDIR\',"
+echo " by user: \'$USERNAME\'."
+echo "#==========================================#"
+echo "" 
 su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
-
