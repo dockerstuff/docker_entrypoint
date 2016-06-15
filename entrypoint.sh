@@ -66,7 +66,7 @@ USERNAME=$(config_user)
 # To simplify the permissions now, I'll give ownership.
 #TODO: give 'w/r/x' permissions instead of changing ownership;
 #      this is important 'cause WORKDIR could already exist.
-chown ${USERNAME}: $WORKDIR && chmod u+w $WORKDIR
+chown ${USERNAME}: $WORKDIR && chmod -R u+wrx $WORKDIR
 
 echo "" 
 echo "#==========================================#"
