@@ -42,7 +42,7 @@ function config_user()
             -g "$DGID" \
             -d "/home/$DUSER" -m \
             -s /bin/bash \
-            "$DUSER" || return 1
+            "$DUSER" || DUSER=$(id -u $DUID -n)
     
     echo "$DUSER"
     return 0
