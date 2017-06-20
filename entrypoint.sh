@@ -6,7 +6,8 @@
 #set -xv
 
 # Executable to which cl arguments should fit
-EXECAPP="${EXECAPP:-'/bin/bash'}"
+_SHELL='/bin/bash'
+EXECAPP="${EXECAPP:-$_SHELL}"
 
 # Save the input cl arguments
 DARGS="$*"
@@ -38,11 +39,12 @@ function config_user()
     DUID="${DUID:-$DEFAULT_UID}"
     DGID="${DGID:-$DEFAULT_GID}"
     
-    useradd -u "$DUID" \
-            -g "$DGID" \
-            -d "/home/$DUSER" -m \
-            -s /bin/bash \
-            "$DUSER" || DUSER=$(id -u $DUID -n)
+    [[ `id $DUSER > /dev/null` ]] && \
+        useradd -u "$DUID" \
+                -g "$DGID" \
+                -d "/home/$DUSER" -m \
+                -s /bin/bash \
+                "$DUSER"
     
     echo "$DUSER"
     return 0
@@ -67,13 +69,22 @@ USERNAME=$(config_user)
 #TODO: give 'w/r/x' permissions instead of changing ownership;
 #      this is important 'cause WORKDIR could already exist.
 chown ${USERNAME}: $WORKDIR && chmod -R u+wrx $WORKDIR
+USERID=$(id -u $USERNAME)
+GROUPID=$(id -g $USERNAME)
 
 echo "" 
-echo "#==========================================#"
-echo " This container is running: \'$EXECAPP\',"
-echo " with arguments: \'$DARGS\',"
-echo " at directory: \'$WORKDIR\',"
-echo " by user: \'$USERNAME\'."
-echo "#==========================================#"
+echo "#====================================================#"
+echo " This container is running: '$EXECAPP',"
+echo " with arguments: '$DARGS',"
+echo " at directory: '$WORKDIR',"
+echo " by user: '${USERNAME} (uid:$USERID,gid:$GROUPID)'."
+echo "#====================================================#"
 echo "" 
-su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
+if [ "$EXECAPP" != "$_SHELL" ]; then
+    echo "Running execapp"
+    su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
+else
+    echo "Running bash"
+    cd $WORKDIR && su $USERNAME
+fi
+
