@@ -81,10 +81,8 @@ echo " by user: '${USERNAME} (uid:$USERID,gid:$GROUPID)'."
 echo "#====================================================#"
 echo "" 
 if [ "$EXECAPP" != "$_SHELL" ]; then
-    echo "Running execapp"
     su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
 else
-    echo "Running bash"
     cd $WORKDIR && su $USERNAME
 fi
 
