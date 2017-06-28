@@ -39,11 +39,11 @@ function config_user()
     DUID="${DUID:-$DEFAULT_UID}"
     DGID="${DGID:-$DEFAULT_GID}"
 
-    `id $DUSER &> /dev/null` || useradd -u "$DUID" \
-                                        -g "$DGID" \
-                                        -d "/home/$DUSER" -m \
-                                        -s /bin/bash \
-                                        "$DUSER"
+    id $DUSER &> /dev/null || useradd -u "$DUID" \
+                                      -g "$DGID" \
+                                      -d "/home/$DUSER" -m \
+                                      -s /bin/bash \
+                                      "$DUSER"
 
     echo "$DUSER"
     return 0
@@ -54,7 +54,7 @@ function config_user()
 USERNAME=$(config_user)
 
 # If no user created, define the current one (root)
-[ `id "$USERNAME"` ] || USERNAME="$USER"
+id "$USERNAME" || USERNAME="$USER"
 
 # Garantee the user will run on a proper place.
 # WORKDIR is the dir where the user will run from.
