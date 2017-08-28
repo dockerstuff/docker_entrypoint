@@ -23,29 +23,29 @@ function config_user()
     # It is meant to run during container's init     #
     #  process. Such process is necessary to better  #
     #  exchange files/bus between host/container.    #
-    # Variables DUSER, DUID, DGID are read from the  #
-    #  environment; if NOUSER is set, do nothing.    #
+    # Variables DOCKER_USER, DOCKER_UID, DOCKER_GID  #
+    #  are read from the environment;                #
+    #  if NOUSER is set, do nothing.                 #
     #================================================#
 
     DEFAULT_USER="user"
     DEFAULT_UID="1000"
     DEFAULT_GID="100"
 
-    [[ ! -z "$NOUSER" ]] && \
-        # nothing to be done here
-        return 0
+    [[ -n "$NOUSER" ]] && \
+        return 0       # nothing to be done here
 
-    DUSER="${DUSER:-$DEFAULT_USER}"
-    DUID="${DUID:-$DEFAULT_UID}"
-    DGID="${DGID:-$DEFAULT_GID}"
+    DOCKER_USER="${DOCKER_USER:-$DEFAULT_USER}"
+    DOCKER_UID="${DOCKER_UID:-$DEFAULT_UID}"
+    DOCKER_GID="${DOCKER_GID:-$DEFAULT_GID}"
 
-    id $DUSER &> /dev/null || useradd -u "$DUID" \
-                                      -g "$DGID" \
-                                      -d "/home/$DUSER" -m \
-                                      -s /bin/bash \
-                                      "$DUSER"
+    id $DOCKER_USER &> /dev/null || useradd -u "$DOCKER_UID" \
+                                            -g "$DOCKER_GID" \
+                                            -d "/home/$DOCKER_USER" -m \
+                                            -s /bin/bash \
+                                            "$DOCKER_USER"
 
-    echo "$DUSER"
+    echo "$DOCKER_USER"
     return 0
 }
 
@@ -53,7 +53,7 @@ function config_user()
 # Add a user here
 USERNAME=$(config_user)
 
-# If no user created, define the current one (root)
+# If no user created, use the current one (root by default)
 id "$USERNAME" || USERNAME="$USER"
 
 # Garantee the user will run on a proper place.
