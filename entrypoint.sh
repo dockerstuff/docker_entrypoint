@@ -82,5 +82,9 @@ echo ""
 if [ "$EXECAPP" != "$_SHELL" ]; then
     su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
 else
-    cd $WORKDIR && su $USERNAME
+    if [ -z "$DARGS" ]; then
+        cd $WORKDIR && su $USERNAME
+    else
+        su -l $USERNAME -c "cd $WORKDIR && $DARGS"
+    fi
 fi
