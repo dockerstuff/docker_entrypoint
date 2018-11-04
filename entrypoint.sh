@@ -80,11 +80,11 @@ echo " by user: '${USERNAME} (uid:$USERID,gid:$GROUPID)'."
 echo "#====================================================#"
 echo ""
 if [ "$EXECAPP" != "$_SHELL" ]; then
-    su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
+    cd $WORKDIR && su $USERNAME -c "$EXECAPP $DARGS"
 else
     if [ -z "$DARGS" ]; then
         cd $WORKDIR && su $USERNAME
     else
-        su -l $USERNAME -c "cd $WORKDIR && $DARGS"
+        cd $WORKDIR && su $USERNAME -c "$DARGS"
     fi
 fi
