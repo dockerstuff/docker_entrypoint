@@ -1,6 +1,16 @@
 # Docker Commons
 Common script/settings for docker containers.
 
+## How to use it
+
+Put at the end of your `Dockerfile`:
+```
+RUN git clone -b stable https://github.com/chbrandt/docker_commons.git && \
+    ln -sf docker_commons/entrypoint.sh /.
+
+ENTRYPOINT ["/entrypoint.sh"]
+```
+
 ## Entrypoint
 `entrypoint.sh` setup a [user](#user-setup) and a work directory with the proper permissions.
 If the image where `entrypoint.sh` is being used has a `EXECAPP` defined, the
