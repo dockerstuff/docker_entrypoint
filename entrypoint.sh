@@ -54,7 +54,7 @@ function config_user()
 USERNAME=$(config_user)
 
 # If no user created, use the current one (root by default)
-id "$USERNAME" || USERNAME="$USER"
+id "$USERNAME" 2> /dev/null || USERNAME="$USER"
 
 # Garantee the user will run on a proper place.
 # WORKDIR is the dir where the user will run from.
@@ -73,18 +73,20 @@ GROUPID=$(id -g $USERNAME)
 
 echo ""
 echo "#====================================================#"
-echo " This container is running: '$EXECAPP',"
-echo " with arguments: '$DARGS',"
-echo " at directory: '$WORKDIR',"
+echo " This container is running: $EXECAPP"
+echo " with arguments: $DARGS"
+echo ""
 echo " by user: '${USERNAME} (uid:$USERID,gid:$GROUPID)'."
 echo "#====================================================#"
 echo ""
+
 if [ "$EXECAPP" != "$_SHELL" ]; then
-    cd $WORKDIR && su $USERNAME -c "$EXECAPP $DARGS"
+    su -l $USERNAME -c "cd $WORKDIR && $EXECAPP $DARGS"
 else
     if [ -z "$DARGS" ]; then
-        cd $WORKDIR && su $USERNAME
+        #cd $WORKDIR && su $USERNAME
+        su -l $USERNAME
     else
-        cd $WORKDIR && su $USERNAME -c "$DARGS"
+        su -l $USERNAME -c "cd $WORKDIR && $DARGS"
     fi
 fi
