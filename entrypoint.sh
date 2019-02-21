@@ -87,6 +87,10 @@ else
         #cd $WORKDIR && su $USERNAME
         su -l $USERNAME
     else
-        su -l $USERNAME -c "cd $WORKDIR && $DARGS"
+        if [[ "$DARGS" == "--help" || "$DARGS" == "-h" && -f "/README.txt" ]]; then
+            cat /README.txt
+        else
+          su -l $USERNAME -c "cd $WORKDIR && $DARGS"
+        fi
     fi
 fi
